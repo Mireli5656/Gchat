@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.project.gchat">
 
-    <!-- Tətbiqin işləməsi üçün vacib olan icazələr -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -16,7 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
 
-        <!-- Proqram açılanda ilk işə düşəcək ekran -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -25,5 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".qr.QRScannerActivity" />
+
+        <activity android:name=".webrtc.CallActivity" />
+
     </application>
 </manifest>
