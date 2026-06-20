@@ -1,5 +1,7 @@
 package com.project.gchat.qr
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -20,7 +22,6 @@ class QRScannerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 7-ci faylda yaratdığımız dizaynı bu ekrana bağlayırıq
         setContentView(R.layout.activity_qr_scanner)
 
         viewFinder = findViewById(R.id.viewFinder)
@@ -34,24 +35,23 @@ class QRScannerActivity : AppCompatActivity() {
 
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(viewFinder.surfaceProvider)
+            }
 
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(viewFinder.surfaceProvider)
-                }
-
-            // Görüntünü analiz edib QR kodu axtaran hissə
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, QRAnalyzer { qrCodeValue ->
-                        // QR kod tapılanda işə düşür
-                        Log.d("GChat_QR", "Uğurlu! Kod: $qrCodeValue")
+                        Log.d("GChat_QR", "Kod: $qrCodeValue")
                         runOnUiThread {
-                            Toast.makeText(this, "Açar oxundu: Xahiş olunur gözləyin...", Toast.LENGTH_SHORT).show()
-                            // Burada kod yaddaşa yazılacaq və ekran bağlanacaq
+                            Toast.makeText(this, "Açar oxundu!", Toast.LENGTH_SHORT).show()
+                            
+                            // YENİLƏNƏN HİSSƏ: Açarı cibinə qoyub əsas ekrana göndərir
+                            val resultIntent = Intent()
+                            resultIntent.putExtra("SCAN_RESULT", qrCodeValue)
+                            setResult(Activity.RESULT_OK, resultIntent)
                             finish()
                         }
                     })
@@ -63,9 +63,8 @@ class QRScannerActivity : AppCompatActivity() {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalyzer)
             } catch (e: Exception) {
-                Log.e("GChat_Error", "Kamera xətası: Kameranı açmaq mümkün olmadı", e)
+                Log.e("GChat_Error", "Kamera xətası", e)
             }
-
         }, ContextCompat.getMainExecutor(this))
     }
 
@@ -75,7 +74,6 @@ class QRScannerActivity : AppCompatActivity() {
     }
 }
 
-// Google ML Kit QR Kod oxuyucu modulu
 class QRAnalyzer(private val onQrCodeDetected: (String) -> Unit) : ImageAnalysis.Analyzer {
     private val scanner = BarcodeScanning.getClient()
 
@@ -87,14 +85,10 @@ class QRAnalyzer(private val onQrCodeDetected: (String) -> Unit) : ImageAnalysis
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
                     for (barcode in barcodes) {
-                        barcode.rawValue?.let { 
-                            onQrCodeDetected(it) 
-                        }
+                        barcode.rawValue?.let { onQrCodeDetected(it) }
                     }
                 }
-                .addOnCompleteListener { 
-                    imageProxy.close() 
-                }
+                .addOnCompleteListener { imageProxy.close() }
         } else {
             imageProxy.close()
         }
