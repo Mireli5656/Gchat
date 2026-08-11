@@ -1,15 +1,15 @@
 package com.gchat.app
 
 import android.os.Bundle
-import android.widget.Button
+import android.graphics.Color
+import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.gchat.app.data.ContactManager
-import com.gchat.app.model.GChatContact
-import com.gchat.app.qr.QRData
 
-class ContactActivity : AppCompatActivity() {
+class ContactsActivity : AppCompatActivity() {
 
     private lateinit var contactManager: ContactManager
 
@@ -18,59 +18,94 @@ class ContactActivity : AppCompatActivity() {
 
         contactManager = ContactManager(this)
 
-        val qrData = intent.getStringExtra("qr_data")
+        showContacts()
+    }
 
-        val data = qrData?.let {
-            QRData.decode(it)
+    override fun onResume() {
+        super.onResume()
+
+        if (::contactManager.isInitialized) {
+            showContacts()
         }
+    }
 
-        val layout = LinearLayout(this).apply {
+    private fun showContacts() {
+
+        val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(32, 32, 32, 32)
+            setPadding(24, 24, 24, 24)
         }
 
         val title = TextView(this).apply {
-            text = "GChat Contact"
+            text = "Contacts"
             textSize = 28f
+            gravity = Gravity.CENTER
+            setPadding(0, 16, 0, 32)
         }
 
-        val name = TextView(this).apply {
-            text = data?.name ?: "Naməlum istifadəçi"
-            textSize = 22f
-            setPadding(0, 32, 0, 8)
-        }
+        root.addView(title)
 
-        val id = TextView(this).apply {
-            text = data?.id?.let { "@$it" } ?: "Yanlış QR kod"
-            textSize = 16f
-        }
+        val contacts = contactManager.getContacts()
 
-        val addButton = Button(this).apply {
-            text = "Add Contact"
-            isEnabled = data != null
-        }
+        if (contacts.isEmpty()) {
 
-        addButton.setOnClickListener {
+            val empty = TextView(this).apply {
+                text = "Hələ kontakt yoxdur"
+                textSize = 18f
+                gravity = Gravity.CENTER
+            }
 
-            if (data != null) {
+            root.addView(empty)
 
-                contactManager.addContact(
-                    GChatContact(
-                        id = data.id,
-                        name = data.name
+        } else {
+
+            contacts.forEach { contact ->
+
+                val item = TextView(this).apply {
+                    text = "${contact.name}\n@${contact.id}"
+                    textSize = 18f
+                    setTextColor(Color.BLACK)
+                    setPadding(16, 20, 16, 20)
+                    isClickable = true
+                    isFocusable = true
+                }
+
+                item.setOnClickListener {
+
+                    val intent = android.content.Intent(
+                        this,
+                        ChatActivity::class.java
+                    )
+
+                    intent.putExtra(
+                        "contact_id",
+                        contact.id
+                    )
+
+                    intent.putExtra(
+                        "contact_name",
+                        contact.name
+                    )
+
+                    startActivity(intent)
+                }
+
+                root.addView(item)
+
+                val divider = View(this).apply {
+                    setBackgroundColor(Color.LTGRAY)
+                }
+
+                root.addView(
+                    divider,
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        1
                     )
                 )
-
-                addButton.text = "Added ✓"
-                addButton.isEnabled = false
             }
         }
 
-        layout.addView(title)
-        layout.addView(name)
-        layout.addView(id)
-        layout.addView(addButton)
-
-        setContentView(layout)
+        setContentView(root)
     }
 }
