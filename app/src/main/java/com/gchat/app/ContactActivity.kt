@@ -5,12 +5,18 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.gchat.app.data.ContactManager
+import com.gchat.app.model.GChatContact
 import com.gchat.app.qr.QRData
 
 class ContactActivity : AppCompatActivity() {
 
+    private lateinit var contactManager: ContactManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        contactManager = ContactManager(this)
 
         val qrData = intent.getStringExtra("qr_data")
 
@@ -42,6 +48,22 @@ class ContactActivity : AppCompatActivity() {
         val addButton = Button(this).apply {
             text = "Add Contact"
             isEnabled = data != null
+        }
+
+        addButton.setOnClickListener {
+
+            if (data != null) {
+
+                contactManager.addContact(
+                    GChatContact(
+                        id = data.id,
+                        name = data.name
+                    )
+                )
+
+                addButton.text = "Added ✓"
+                addButton.isEnabled = false
+            }
         }
 
         layout.addView(title)
