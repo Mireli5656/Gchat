@@ -4,11 +4,13 @@ data class QRData(
     val id: String,
     val name: String
 ) {
+
     fun encode(): String {
         return "GCHAT|1|$id|$name"
     }
 
     companion object {
+
         fun decode(data: String): QRData? {
             val parts = data.split("|")
 
