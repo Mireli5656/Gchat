@@ -22,6 +22,12 @@ class MainActivity : AppCompatActivity() {
         userManager = UserManager(this)
 
         setupUser()
+
+        binding.btnScanQR.setOnClickListener {
+            startActivity(
+                Intent(this, ScannerActivity::class.java)
+            )
+        }
     }
 
     private fun setupUser() {
@@ -29,13 +35,20 @@ class MainActivity : AppCompatActivity() {
         val existingUser = userManager.getUser()
 
         if (existingUser != null) {
-            showUser(existingUser.name, existingUser.id)
+
+            showUser(
+                existingUser.name,
+                existingUser.id
+            )
 
             binding.btnCreateUser.isEnabled = false
             binding.etName.isEnabled = false
             binding.btnMyQR.isEnabled = true
 
-            setupQRButton(existingUser.id, existingUser.name)
+            setupQRButton(
+                existingUser.id,
+                existingUser.name
+            )
 
             return
         }
@@ -53,17 +66,26 @@ class MainActivity : AppCompatActivity() {
 
             val user = userManager.createUser(name)
 
-            showUser(user.name, user.id)
+            showUser(
+                user.name,
+                user.id
+            )
 
             binding.btnCreateUser.isEnabled = false
             binding.etName.isEnabled = false
             binding.btnMyQR.isEnabled = true
 
-            setupQRButton(user.id, user.name)
+            setupQRButton(
+                user.id,
+                user.name
+            )
         }
     }
 
-    private fun showUser(name: String, id: String) {
+    private fun showUser(
+        name: String,
+        id: String
+    ) {
 
         binding.tvWelcome.text =
             "Xoş gəlmisən, $name!"
@@ -72,7 +94,10 @@ class MainActivity : AppCompatActivity() {
             "@$id"
     }
 
-    private fun setupQRButton(id: String, name: String) {
+    private fun setupQRButton(
+        id: String,
+        name: String
+    ) {
 
         binding.btnMyQR.setOnClickListener {
 
@@ -81,14 +106,17 @@ class MainActivity : AppCompatActivity() {
                 name = name
             )
 
-            val encodedData = qrData.encode()
-
-            val bitmap = QRGenerator.generate(encodedData)
+            val bitmap = QRGenerator.generate(
+                qrData.encode()
+            )
 
             QRActivity.bitmap = bitmap
 
             startActivity(
-                Intent(this, QRActivity::class.java)
+                Intent(
+                    this,
+                    QRActivity::class.java
+                )
             )
         }
     }
