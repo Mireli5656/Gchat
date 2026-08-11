@@ -7,7 +7,11 @@ import com.google.zxing.MultiFormatWriter
 
 object QRGenerator {
 
-    fun generate(data: String, size: Int = 800): Bitmap {
+    fun generate(
+        data: String,
+        size: Int = 800
+    ): Bitmap {
+
         val matrix = MultiFormatWriter().encode(
             data,
             BarcodeFormat.QR_CODE,
@@ -26,7 +30,11 @@ object QRGenerator {
                 bitmap.setPixel(
                     x,
                     y,
-                    if (matrix[x, y]) Color.BLACK else Color.WHITE
+                    if (matrix[x, y]) {
+                        Color.BLACK
+                    } else {
+                        Color.WHITE
+                    }
                 )
             }
         }
