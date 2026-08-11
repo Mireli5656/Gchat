@@ -28,6 +28,12 @@ class MainActivity : AppCompatActivity() {
                 Intent(this, ScannerActivity::class.java)
             )
         }
+
+        binding.btnContacts.setOnClickListener {
+            startActivity(
+                Intent(this, ContactsActivity::class.java)
+            )
+        }
     }
 
     private fun setupUser() {
