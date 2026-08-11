@@ -11,6 +11,14 @@
         android:theme="@style/Theme.GChat">
 
         <activity
+            android:name=".ContactActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ScannerActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".QRActivity"
             android:exported="false" />
 
