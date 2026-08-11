@@ -1,9 +1,12 @@
 package com.gchat.app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.gchat.app.data.UserManager
 import com.gchat.app.databinding.ActivityMainBinding
+import com.gchat.app.qr.QRData
+import com.gchat.app.qr.QRGenerator
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,11 +29,13 @@ class MainActivity : AppCompatActivity() {
         val existingUser = userManager.getUser()
 
         if (existingUser != null) {
-            binding.tvWelcome.text =
-                "Xoş gəlmisən, ${existingUser.name}!"
+            showUser(existingUser.name, existingUser.id)
 
-            binding.tvUserId.text =
-                "@${existingUser.id}"
+            binding.btnCreateUser.isEnabled = false
+            binding.etName.isEnabled = false
+            binding.btnMyQR.isEnabled = true
+
+            setupQRButton(existingUser.id, existingUser.name)
 
             return
         }
@@ -48,15 +53,43 @@ class MainActivity : AppCompatActivity() {
 
             val user = userManager.createUser(name)
 
-            binding.tvWelcome.text =
-                "Xoş gəlmisən, ${user.name}!"
-
-            binding.tvUserId.text =
-                "@${user.id}"
-
-            binding.etName.text.clear()
+            showUser(user.name, user.id)
 
             binding.btnCreateUser.isEnabled = false
+            binding.etName.isEnabled = false
+            binding.btnMyQR.isEnabled = true
+
+            setupQRButton(user.id, user.name)
+        }
+    }
+
+    private fun showUser(name: String, id: String) {
+
+        binding.tvWelcome.text =
+            "Xoş gəlmisən, $name!"
+
+        binding.tvUserId.text =
+            "@$id"
+    }
+
+    private fun setupQRButton(id: String, name: String) {
+
+        binding.btnMyQR.setOnClickListener {
+
+            val qrData = QRData(
+                id = id,
+                name = name
+            )
+
+            val encodedData = qrData.encode()
+
+            val bitmap = QRGenerator.generate(encodedData)
+
+            QRActivity.bitmap = bitmap
+
+            startActivity(
+                Intent(this, QRActivity::class.java)
+            )
         }
     }
 }
