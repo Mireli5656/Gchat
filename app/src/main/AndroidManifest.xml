@@ -11,6 +11,10 @@
         android:theme="@style/Theme.GChat">
 
         <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ContactsActivity"
             android:exported="false" />
 
