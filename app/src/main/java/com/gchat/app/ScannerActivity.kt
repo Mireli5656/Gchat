@@ -1,5 +1,6 @@
 package com.gchat.app
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.journeyapps.barcodescanner.ScanContract
@@ -12,14 +13,13 @@ class ScannerActivity : AppCompatActivity() {
     ) { result ->
 
         if (result.contents != null) {
-            val data = result.contents
 
             val intent = android.content.Intent(
                 this,
                 ContactActivity::class.java
             )
 
-            intent.putExtra("qr_data", data)
+            intent.putExtra("qr_data", result.contents)
 
             startActivity(intent)
         }
@@ -28,11 +28,16 @@ class ScannerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Scanner həmişə portret vəziyyətində açılsın
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
         val options = ScanOptions().apply {
             setDesiredBarcodeFormats(ScanOptions.QR_CODE)
             setPrompt("GChat QR kodunu skan et")
             setBeepEnabled(true)
-            setOrientationLocked(false)
+
+            // Ekranın dönməsinə icazə vermə
+            setOrientationLocked(true)
         }
 
         barcodeLauncher.launch(options)
