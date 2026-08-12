@@ -24,6 +24,7 @@
 
         <activity
             android:name=".ScannerActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <activity
