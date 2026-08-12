@@ -5,18 +5,22 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
-import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.gchat.app.data.ContactManager
+import com.gchat.app.model.GChatContact
 
 class ContactsActivity : AppCompatActivity() {
 
     private lateinit var contactManager: ContactManager
     private lateinit var contactsContainer: LinearLayout
+
+    private var allContacts: List<GChatContact> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,23 +42,26 @@ class ContactsActivity : AppCompatActivity() {
         val header = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(18.dp(), 0, 12.dp(), 0)
+            setPadding(8.dp(), 0, 12.dp(), 0)
             setBackgroundColor(Color.rgb(20, 110, 180))
         }
 
         val back = TextView(this).apply {
             text = "‹"
             textSize = 40f
-            setTextColor(Color.WHITE)
             gravity = Gravity.CENTER
-            setOnClickListener { finish() }
+            setTextColor(Color.WHITE)
+
+            setOnClickListener {
+                finish()
+            }
         }
 
         header.addView(
             back,
             LinearLayout.LayoutParams(
-                48.dp(),
-                64.dp()
+                52.dp(),
+                68.dp()
             )
         )
 
@@ -86,8 +93,13 @@ class ContactsActivity : AppCompatActivity() {
         val search = EditText(this).apply {
             hint = "Kontakt axtar..."
             textSize = 16f
-            singleLine = true
-            setPadding(18.dp(), 0, 18.dp(), 0)
+            setSingleLine(true)
+            setPadding(
+                18.dp(),
+                0,
+                18.dp(),
+                0
+            )
 
             background = GradientDrawable().apply {
                 setColor(Color.rgb(245, 245, 245))
@@ -107,9 +119,12 @@ class ContactsActivity : AppCompatActivity() {
             10.dp()
         )
 
-        root.addView(search, searchParams)
+        root.addView(
+            search,
+            searchParams
+        )
 
-        // CONTACTS
+        // CONTACT LIST
         contactsContainer = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
         }
@@ -123,7 +138,7 @@ class ContactsActivity : AppCompatActivity() {
             )
         )
 
-        // BOTTOM NAV
+        // BOTTOM NAVIGATION
         val bottom = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -152,15 +167,17 @@ class ContactsActivity : AppCompatActivity() {
 
         setContentView(root)
 
-        // SEARCH FILTER
+        // SEARCH
         search.addTextChangedListener(
-            object : android.text.TextWatcher {
+            object : TextWatcher {
+
                 override fun beforeTextChanged(
                     s: CharSequence?,
                     start: Int,
                     count: Int,
                     after: Int
-                ) {}
+                ) {
+                }
 
                 override fun onTextChanged(
                     s: CharSequence?,
@@ -168,17 +185,16 @@ class ContactsActivity : AppCompatActivity() {
                     before: Int,
                     count: Int
                 ) {
-                    filterContacts(s.toString())
+                    filterContacts(s?.toString() ?: "")
                 }
 
                 override fun afterTextChanged(
-                    s: android.text.Editable?
-                ) {}
+                    s: Editable?
+                ) {
+                }
             }
         )
     }
-
-    private var allContacts = listOf<com.gchat.app.data.Contact>()
 
     private fun loadContacts() {
 
@@ -189,16 +205,22 @@ class ContactsActivity : AppCompatActivity() {
 
     private fun filterContacts(query: String) {
 
-        val filtered = allContacts.filter {
-            it.name.contains(query, ignoreCase = true) ||
-            it.id.contains(query, ignoreCase = true)
+        val filtered = allContacts.filter { contact ->
+
+            contact.name.contains(
+                query,
+                ignoreCase = true
+            ) || contact.id.contains(
+                query,
+                ignoreCase = true
+            )
         }
 
         displayContacts(filtered)
     }
 
     private fun displayContacts(
-        contacts: List<com.gchat.app.data.Contact>
+        contacts: List<GChatContact>
     ) {
 
         contactsContainer.removeAllViews()
@@ -234,12 +256,14 @@ class ContactsActivity : AppCompatActivity() {
                     18.dp(),
                     8.dp()
                 )
+
                 isClickable = true
                 isFocusable = true
             }
 
             // AVATAR
             val avatar = TextView(this).apply {
+
                 text = contact.name
                     .take(1)
                     .uppercase()
@@ -265,7 +289,12 @@ class ContactsActivity : AppCompatActivity() {
             // INFO
             val info = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                setPadding(16.dp(), 0, 0, 0)
+                setPadding(
+                    16.dp(),
+                    0,
+                    0,
+                    0
+                )
             }
 
             val name = TextView(this).apply {
@@ -293,7 +322,7 @@ class ContactsActivity : AppCompatActivity() {
                 )
             )
 
-            // CONTACT → CHAT
+            // KONTAK → CHAT
             item.setOnClickListener {
 
                 val intent = Intent(
@@ -324,7 +353,9 @@ class ContactsActivity : AppCompatActivity() {
         }
     }
 
-    private fun createNavItem(text: String): TextView {
+    private fun createNavItem(
+        text: String
+    ): TextView {
 
         return TextView(this).apply {
 
