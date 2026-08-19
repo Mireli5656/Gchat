@@ -23,9 +23,14 @@
             android:exported="false" />
 
         <activity
-            android:name=".ScannerActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+    android:name=".ScannerActivity"
+    android:screenOrientation="portrait"
+    android:exported="false" />
+
+<activity
+    android:name="com.journeyapps.barcodescanner.CaptureActivity"
+    android:screenOrientation="portrait"
+    android:exported="false" />
 
         <activity
             android:name=".QRActivity"
