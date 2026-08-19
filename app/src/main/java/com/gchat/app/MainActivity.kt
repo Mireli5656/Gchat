@@ -5,8 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.gchat.app.data.UserManager
 import com.gchat.app.databinding.ActivityMainBinding
-import com.gchat.app.qr.QRData
-import com.gchat.app.qr.QRGenerator
 
 class MainActivity : AppCompatActivity() {
 
@@ -92,7 +90,6 @@ class MainActivity : AppCompatActivity() {
         name: String,
         id: String
     ) {
-
         binding.tvWelcome.text =
             "Xoş gəlmisən, $name!"
 
@@ -107,23 +104,22 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnMyQR.setOnClickListener {
 
-            val qrData = QRData(
-                id = id,
-                name = name
+            val intent = Intent(
+                this,
+                QRActivity::class.java
             )
 
-            val bitmap = QRGenerator.generate(
-                qrData.encode()
+            intent.putExtra(
+                QRActivity.EXTRA_ID,
+                id
             )
 
-            QRActivity.bitmap = bitmap
-
-            startActivity(
-                Intent(
-                    this,
-                    QRActivity::class.java
-                )
+            intent.putExtra(
+                QRActivity.EXTRA_NAME,
+                name
             )
+
+            startActivity(intent)
         }
     }
 }
